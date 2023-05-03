@@ -1,25 +1,10 @@
 import fileio
+from transform import apply_transform
 from audiomentations import \
     AddGaussianNoise,\
     AddShortNoises,\
     AddBackgroundNoise,\
     Compose
-
-
-def apply_transforms(source_list, transforms_queue=None):
-    if (type(transforms_queue) is not list) or (len(transforms_queue) == 0):
-        return source_list
-
-    modified_list = []
-    for samples, sr in source_list:
-        new_samples = samples
-        for transform in transforms_queue:
-            if not callable(transform):
-                continue
-            new_samples = transform(new_samples, sr)
-        modified_list.append((new_samples, sr))
-    return modified_list
-
 
 # Paths
 source_dir = "./samples"
@@ -54,5 +39,5 @@ transformGN = AddGaussianNoise(
 tf_list = [transformBG, transformSN, transformGN]
 
 fname_l, audio_l = fileio.load_from_dir(source_dir, file_mask, 200)
-mod_audio_l = apply_transforms(audio_l, [Compose(tf_list, p=1.0, shuffle=False)])
+mod_audio_l = apply_transform(audio_l, Compose(tf_list, p=1.0, shuffle=False))
 new_fname_l, new_audio_l = fileio.unload_audio(dest_dir, fname_l, mod_audio_l)
