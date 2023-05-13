@@ -5,13 +5,13 @@ from librosa import load
 from soundfile import write
 
 
-def load_from_dir(dir_name, mask=r".*", samples_needed=100000):
+def load_from_dir(dir_name, sr=22050, mask=".*", samples_needed=100000):
     dir_files = os.listdir(dir_name)
     dir_files = list(filter(lambda x: os.path.isfile(os.path.join(dir_name, x)), dir_files))
-    dir_files = list(filter(lambda x: fullmatch(mask, x), dir_files))
+    dir_files = list(filter(lambda x: fullmatch(repr(mask)[1:-1], x), dir_files))
     samples_n = min(samples_needed, len(dir_files))
     fname_list = [os.path.join(dir_name, file_name) for file_name in sample(dir_files, samples_n)]
-    return fname_list, [load(file) for file in fname_list]
+    return fname_list, [load(file, sr=sr) for file in fname_list]
 
 
 def unload_audio(dir_name, fname_list, audio_list, note=""):
